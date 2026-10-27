@@ -2,16 +2,23 @@
 
 import { useEffect, useRef, useState } from "react";
 
-type DocInfo = { id: string; filename: string; pages: number; chunks: number; characters: number; indexedAt: string };
-type Chunk = { text: string; page: number; chunk: number; score?: number };
-type Message = { role: "user" | "assistant"; content: string; chunks?: Chunk[] };
+type Profile = "narrative" | "structured" | "visual";
+type DocInfo = { id: string; filename: string; profile?: Profile; pages: number; chunks: number; characters: number; indexedAt: string };
+type Chunk = { id: number; text: string; page: number; pageEnd: number; section: string; kind: string; score?: number };
+type Message = { role: "user" | "assistant"; content: string; chunks?: Chunk[]; scope?: string | null };
 type UploadResult = {
   document: DocInfo;
   settings: { chunkSize: number; chunkOverlap: number; embeddingModel: string };
-  preview: { chunk: number; page: number | null; text: string }[];
+  preview: { chunk: number; page: number | null; section: string; text: string }[];
 };
 
-const STAGES = ["Upload", "Parse", "Chunk", "Embed", "Store", "Retrieve", "Answer"];
+const STAGES = ["Parse", "Chunk", "Embed", "Store", "Retrieve", "Rerank", "Context", "Answer"];
+const PROFILES: { value: Profile | ""; label: string }[] = [
+  { value: "", label: "Auto-detect" },
+  { value: "narrative", label: "Narrative (plain text report)" },
+  { value: "structured", label: "Structured (long, chapters/sections)" },
+  { value: "visual", label: "Visual (charts, tables, footnotes)" },
+];
 
 export default function Home() {
   const [documents, setDocuments] = useState<DocInfo[]>([]);
@@ -21,7 +28,8 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [asking, setAsking] = useState(false);
-  const [topK, setTopK] = useState(3);
+  const [topK, setTopK] = useState(6);
+  const [profile, setProfile] = useState<Profile | "">("");
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -43,6 +51,7 @@ export default function Home() {
     try {
       const form = new FormData();
       form.append("file", file);
+      if (profile) form.append("profile", profile);
       const res = await fetch("/api/upload", { method: "POST", body: form });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Upload failed");
@@ -75,7 +84,7 @@ export default function Home() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Chat failed");
-      setMessages((m) => [...m, { role: "assistant", content: data.answer, chunks: data.chunks }]);
+      setMessages((m) => [...m, { role: "assistant", content: data.answer, chunks: data.chunks, scope: data.scope }]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Chat failed");
     } finally {
@@ -111,6 +120,13 @@ export default function Home() {
             <form onSubmit={handleUpload} className="flex flex-col gap-3">
               <input ref={fileRef} type="file" accept=".pdf,.txt,.md" required
                 className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-sm dark:file:bg-zinc-800" />
+              <label className="text-sm">
+                Document profile
+                <select value={profile} onChange={(e) => setProfile(e.target.value as Profile | "")}
+                  className="mt-1 block w-full rounded-md border border-zinc-300 bg-transparent px-2 py-1.5 text-sm dark:border-zinc-700">
+                  {PROFILES.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+                </select>
+              </label>
               <button type="submit" disabled={uploading}
                 className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50">
                 {uploading ? "Parsing → chunking → embedding…" : "Index document"}
@@ -119,7 +135,7 @@ export default function Home() {
 
             {upload && (
               <div className="mt-4 space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
-                <p>📖 Parsed <b>{upload.document.pages}</b> page(s), {upload.document.characters.toLocaleString()} chars</p>
+                <p>📖 Parsed <b>{upload.document.pages}</b> page(s), {upload.document.characters.toLocaleString()} chars, profile <b>{upload.document.profile}</b></p>
                 <p>✂️ Split into <b>{upload.document.chunks}</b> chunks (size {upload.settings.chunkSize}, overlap {upload.settings.chunkOverlap})</p>
                 <p>🔢 Embedded with <code>{upload.settings.embeddingModel}</code></p>
                 <p>💾 Stored in <code>data/indexes/{upload.document.id}</code></p>
@@ -128,7 +144,7 @@ export default function Home() {
                   <div className="mt-2 space-y-2">
                     {upload.preview.map((c) => (
                       <pre key={c.chunk} className="whitespace-pre-wrap rounded bg-zinc-100 p-2 text-[11px] dark:bg-zinc-800">
-                        <b>Chunk {c.chunk}{c.page ? ` · page ${c.page}` : ""}</b>{"\n"}{c.text}
+                        <b>Chunk {c.chunk}{c.page ? ` · page ${c.page}` : ""}{c.section ? ` · ${c.section}` : ""}</b>{"\n"}{c.text}
                       </pre>
                     ))}
                   </div>
@@ -146,7 +162,7 @@ export default function Home() {
                     <button onClick={() => { setActiveDoc(d); setMessages([]); setUpload(null); }}
                       className={`w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 ${activeDoc?.id === d.id ? "bg-indigo-50 font-medium text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300" : ""}`}>
                       {d.filename}
-                      <span className="block text-xs text-zinc-500">{d.chunks} chunks</span>
+                      <span className="block text-xs text-zinc-500">{d.chunks} chunks{d.profile ? ` · ${d.profile}` : ""}</span>
                     </button>
                   </li>
                 ))}
@@ -157,8 +173,8 @@ export default function Home() {
           <section className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-3 font-medium">Settings</h2>
             <label className="block text-sm">
-              Chunks to retrieve (k): <b>{topK}</b>
-              <input type="range" min={1} max={8} value={topK} onChange={(e) => setTopK(Number(e.target.value))} className="mt-1 w-full" />
+              Chunks sent to the LLM (k): <b>{topK}</b>
+              <input type="range" min={1} max={10} value={topK} onChange={(e) => setTopK(Number(e.target.value))} className="mt-1 w-full" />
             </label>
             <button onClick={() => setMessages([])} className="mt-3 text-sm text-zinc-500 hover:underline">Clear chat</button>
           </section>
@@ -173,20 +189,21 @@ export default function Home() {
           <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4">
             {messages.length === 0 && activeDoc && (
               <p className="text-sm text-zinc-500">
-                Try: &ldquo;How many vacation days do employees get?&rdquo; then &ldquo;Can I carry them over?&rdquo; and finally something not in the document.
+                Ask a question about the document. Each answer cites its sources ([S1], [S2]…); expand &ldquo;Retrieved chunks&rdquo; to see the page, section and type of each one.
               </p>
             )}
             {messages.map((m, i) => (
               <div key={i} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
                 <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${m.role === "user" ? "bg-indigo-600 text-white" : "bg-zinc-100 dark:bg-zinc-800"}`}>
                   <p className="whitespace-pre-wrap">{m.content}</p>
+                  {m.scope && <p className="mt-1 text-xs text-zinc-500">Searched within: {m.scope}</p>}
                   {m.chunks && m.chunks.length > 0 && (
                     <details className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
                       <summary className="cursor-pointer">Retrieved {m.chunks.length} chunk(s) used for this answer</summary>
                       <div className="mt-2 space-y-2">
-                        {m.chunks.map((c) => (
-                          <pre key={c.chunk} className="whitespace-pre-wrap rounded bg-white p-2 text-[11px] dark:bg-zinc-900">
-                            <b>Chunk {c.chunk}{c.page ? ` · page ${c.page}` : ""}{c.score !== undefined ? ` · score ${c.score.toFixed(3)}` : ""}</b>{"\n"}{c.text}
+                        {m.chunks.map((c, j) => (
+                          <pre key={c.id} className="whitespace-pre-wrap rounded bg-white p-2 text-[11px] dark:bg-zinc-900">
+                            <b>[S{j + 1}] page {c.page}{c.pageEnd > c.page ? `-${c.pageEnd}` : ""}{c.section ? ` · ${c.section}` : ""}{c.kind !== "text" ? ` · ${c.kind}` : ""}{c.score !== undefined ? ` · score ${Number(c.score.toFixed(3))}` : ""}</b>{"\n"}{c.text}
                           </pre>
                         ))}
                       </div>
@@ -195,7 +212,7 @@ export default function Home() {
                 </div>
               </div>
             ))}
-            {asking && <p className="text-sm text-zinc-500">Retrieving context and generating answer…</p>}
+            {asking && <p className="text-sm text-zinc-500">Retrieving, reranking and generating answer…</p>}
             <div ref={bottomRef} />
           </div>
 

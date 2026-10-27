@@ -1,0 +1,71 @@
+[
+  {
+    "doc": "GPO-Anual-report.pdf",
+    "question": "How many depository libraries did GPO staff visit in FY 2018?",
+    "mustInclude": ["166"],
+    "pages": [5, 21]
+  },
+  {
+    "doc": "GPO-Anual-report.pdf",
+    "question": "What new digital system replaced FDsys, and when was it fully deployed?",
+    "mustInclude": ["govinfo", "2018"],
+    "pages": [4, 39]
+  },
+  {
+    "doc": "GPO-Anual-report.pdf",
+    "question": "How much did GPO procure in printing and information products in FY 2018 on behalf of federal agencies?",
+    "mustInclude": ["375"],
+    "pages": [5, 14]
+  },
+  {
+    "doc": "GEP-Jun-2026.pdf",
+    "question": "What is the growth outlook for South Asia in this report?",
+    "mustInclude": ["6.3"],
+    "pages": [96, 97, 98, 99]
+  },
+  {
+    "doc": "GEP-Jun-2026.pdf",
+    "question": "What does Chapter 3 say about sovereign debt in developing economies?",
+    "mustInclude": ["debt", "(interest|spread|yield)"],
+    "pages": [107, 108, 109, 110, 111, 112]
+  },
+  {
+    "doc": "GEP-Jun-2026.pdf",
+    "question": "According to the executive summary, what are the main risks to the global outlook?",
+    "mustInclude": ["(hostilities|escalation|conflict)", "trade"],
+    "pages": [19, 20]
+  },
+  {
+    "doc": "iMac_PER_Oct2024.pdf",
+    "question": "How much less energy does iMac use compared to the ENERGY STAR requirement?",
+    "mustInclude": ["58"],
+    "pages": [7]
+  },
+  {
+    "doc": "iMac_PER_Oct2024.pdf",
+    "question": "What is the total carbon footprint of the iMac, and how much of that comes from product use versus manufacturing?",
+    "mustInclude": ["346", "45 ?(%|percent)", "50 ?(%|percent)"],
+    "pages": [2, 10]
+  },
+  {
+    "doc": "iMac_PER_Oct2024.pdf",
+    "question": "What material is the iMac stand made from, and what percentage of it is recycled?",
+    "mustInclude": ["alumin", "100"],
+    "pages": [1, 2]
+  },
+  {
+    "doc": "GPO-Anual-report.pdf",
+    "question": "What was GPO's total revenue in FY 2025?",
+    "expectRefusal": true
+  },
+  {
+    "doc": "GEP-Jun-2026.pdf",
+    "question": "What is the World Bank's growth forecast for Antarctica?",
+    "expectRefusal": true
+  },
+  {
+    "doc": "iMac_PER_Oct2024.pdf",
+    "question": "What is the battery life of the iMac?",
+    "expectRefusal": true
+  }
+]

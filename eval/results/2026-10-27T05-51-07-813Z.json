@@ -1,0 +1,247 @@
+[
+  {
+    "doc": "GPO-Anual-report.pdf",
+    "question": "How many depository libraries did GPO staff visit in FY 2018?",
+    "mustInclude": [
+      "166"
+    ],
+    "pages": [
+      5,
+      21
+    ],
+    "pass": true,
+    "retrievalHit": true,
+    "missing": [],
+    "scope": null,
+    "answer": "In FY 2018, GPO staff visited 166 depository libraries [S1, p. 21; S2, p. 5].",
+    "retrievedPages": [
+      21,
+      5
+    ]
+  },
+  {
+    "doc": "GPO-Anual-report.pdf",
+    "question": "What new digital system replaced FDsys, and when was it fully deployed?",
+    "mustInclude": [
+      "govinfo",
+      "2018"
+    ],
+    "pages": [
+      4,
+      39
+    ],
+    "pass": true,
+    "retrievalHit": true,
+    "missing": [],
+    "scope": null,
+    "answer": "The new digital system that replaced FDsys is govinfo [S2, p. 4]. The FDsys was scheduled to be completely retired in December 2018 [S1, p. 22; S5, p. 8; S6, p. 4]. The full-scale deployment of govinfo occurred over the course of FY 2018 [S2, p. 4].",
+    "retrievedPages": [
+      22,
+      4,
+      22,
+      10,
+      8,
+      4
+    ]
+  },
+  {
+    "doc": "GPO-Anual-report.pdf",
+    "question": "How much did GPO procure in printing and information products in FY 2018 on behalf of federal agencies?",
+    "mustInclude": [
+      "375"
+    ],
+    "pages": [
+      5,
+      14
+    ],
+    "pass": true,
+    "retrievalHit": true,
+    "missing": [],
+    "scope": null,
+    "answer": "In FY 2018, GPO procured approximately $375.7 million worth of printing and information products on behalf of Federal agencies [S2, p. 17]. Other sources note the value as \"more than $375 million\" [S1, p. 5] and \"$375.7 million\" [S3, p. 14].",
+    "retrievedPages": [
+      5,
+      17,
+      14,
+      25
+    ]
+  },
+  {
+    "doc": "GEP-Jun-2026.pdf",
+    "question": "What is the growth outlook for South Asia in this report?",
+    "mustInclude": [
+      "6.3"
+    ],
+    "pages": [
+      96,
+      97,
+      98,
+      99
+    ],
+    "pass": true,
+    "retrievalHit": true,
+    "missing": [],
+    "scope": "South Asia",
+    "answer": "Growth in South Asia (SAR) is expected to soften to 6.3 percent in 2026, primarily due to the adverse impact of the conflict in the Middle East, which includes higher energy prices, reduced supplies of oil and natural gas, and disruptions to remittances and tourism [S3, p. 96]. \n\nDespite this, the growth forecast has been marginally upgraded since January due to more robust domestic demand and stronger export growth than previously expected [S3, p. 96]. With conflict-related disruptions assumed to wane by the end of the year, growth in SAR is projected to pick up to an average rate of 7 percent per year in 2027–28 [S3, p. 96].",
+    "retrievedPages": [
+      98,
+      98,
+      96,
+      96,
+      97,
+      97
+    ]
+  },
+  {
+    "doc": "GEP-Jun-2026.pdf",
+    "question": "What does Chapter 3 say about sovereign debt in developing economies?",
+    "mustInclude": [
+      "debt",
+      "(interest|spread|yield)"
+    ],
+    "pages": [
+      107,
+      108,
+      109,
+      110,
+      111,
+      112
+    ],
+    "pass": true,
+    "retrievalHit": true,
+    "missing": [],
+    "scope": "Ch. 3 A Rising Challenge: Sovereign Debt Levels and Interest Rates in EMDEs",
+    "answer": "Chapter 3 of the document states that rising government debt in emerging market and developing economies (EMDEs) presents a significant challenge, as it leads to higher interest rates, increased debt-service payments, and a greater likelihood of debt distress [S1, p. 109].\n\nKey points regarding sovereign debt in EMDEs include:\n\n*   **Impact on Interest Rates:** There is a positive, non-linear relationship between debt-to-GDP ratios and both dollar-denominated sovereign bond spreads and domestic-currency government bond yields [S1, p. 109; S2, p. 111]. As debt levels rise, the impact of additional borrowing on interest rates becomes progressively larger [S1, p. 109; S2, p. 111].\n*   **Sensitivity:** Sovereign spreads are more sensitive to debt levels than domestic-currency yields [S2, p. 111]. Furthermore, the sensitivity of interest rates to debt increases significantly in countries with a history of default, low credit ratings, frontier market status, higher inflation, heavy reliance on short-term debt, or weak governance [S1, p. 109; S3, p. 112].\n*   **Trends (2010–2024/2025):** \n    *   Median EMDE debt rose by 20 percentage points of GDP between 2010 and 2024, which added an estimated 114 basis points to sovereign spreads and 31 basis points to domestic-currency yields [S6, p. 112].\n    *   The share of low- and middle-income countries in or at high risk of debt distress rose from 26 percent in 2015 to about 50 percent in 2026 [S4, p. 110].\n    *   While the share of public debt issued in foreign currencies has declined slightly since 2010, it remains sizable at more than 40 percent of the total [S3, p. 112].\n*   **External Factors:** Rising debt in advanced economies has added upward pressure on EMDE interest rates by pushing up yields in those economies [S1, p. 109; S3, p. 112].\n*   **Policy Implications:** The chapter emphasizes the importance of strengthening fiscal positions through domestic revenue mobilization, efficient public spending, and improved debt management [S1, p. 109]. It suggests that fiscal policy should be calibrated to the starting level of debt; at high debt levels, fiscal consolidation is important to contain borrowing costs [S6, p. 112].",
+    "retrievedPages": [
+      109,
+      111,
+      112,
+      110,
+      112,
+      112
+    ]
+  },
+  {
+    "doc": "GEP-Jun-2026.pdf",
+    "question": "According to the executive summary, what are the main risks to the global outlook?",
+    "mustInclude": [
+      "(hostilities|escalation|conflict)",
+      "trade"
+    ],
+    "pages": [
+      19,
+      20
+    ],
+    "pass": true,
+    "retrievalHit": true,
+    "missing": [],
+    "scope": "Executive Summary",
+    "answer": "According to the executive summary, the main risks to the global outlook include:\n\n*   **Conflict and Geopolitical Strains:** The conflict in the Middle East has triggered sharp increases in energy prices, renewed inflationary pressures, and fueled expectations of tighter monetary policy [S2, p. 19]. A renewed escalation of hostilities or more prolonged disruptions to commodity flows could further raise commodity prices, intensify inflationary pressures and food insecurity, trigger financial stress, and lower growth [S2, p. 19].\n*   **Supply Disruptions:** If energy supply disruptions prove more severe than assumed and are accompanied by substantial financial stress, global growth could fall to just 1.3 percent in 2026 [S1, p. 19; S2, p. 19].\n*   **Other Factors:** Persistent trade policy uncertainty, geopolitical strains, and weather-related shocks also pose material risks [S1, p. 19].",
+    "retrievedPages": [
+      19,
+      19,
+      20
+    ]
+  },
+  {
+    "doc": "iMac_PER_Oct2024.pdf",
+    "question": "How much less energy does iMac use compared to the ENERGY STAR requirement?",
+    "mustInclude": [
+      "58"
+    ],
+    "pages": [
+      7
+    ],
+    "pass": true,
+    "retrievalHit": true,
+    "missing": [],
+    "scope": null,
+    "answer": "iMac consumes 58 percent less energy than the requirement for ENERGY STAR [S1, p. 7; S2, p. 7].",
+    "retrievedPages": [
+      7,
+      7,
+      12
+    ]
+  },
+  {
+    "doc": "iMac_PER_Oct2024.pdf",
+    "question": "What is the total carbon footprint of the iMac, and how much of that comes from product use versus manufacturing?",
+    "mustInclude": [
+      "346",
+      "45 ?(%|percent)",
+      "50 ?(%|percent)"
+    ],
+    "pages": [
+      2,
+      10
+    ],
+    "pass": true,
+    "retrievalHit": true,
+    "missing": [],
+    "scope": null,
+    "answer": "The total product footprint for the iMac (two ports) 256GB is 346 kg CO2e [S1, p. 10].\n\nRegarding the breakdown of this footprint:\n*   **Production:** 50% of the total emissions [S1, p. 10].\n*   **Product use:** 45% of the total emissions [S1, p. 10].",
+    "retrievedPages": [
+      10,
+      2,
+      2,
+      9,
+      10,
+      9
+    ]
+  },
+  {
+    "doc": "iMac_PER_Oct2024.pdf",
+    "question": "What material is the iMac stand made from, and what percentage of it is recycled?",
+    "mustInclude": [
+      "alumin",
+      "100"
+    ],
+    "pages": [
+      1,
+      2
+    ],
+    "pass": true,
+    "retrievalHit": true,
+    "missing": [],
+    "scope": null,
+    "answer": "The iMac stand is made from aluminum, and it is 100 percent recycled [S2, p. 4].",
+    "retrievedPages": [
+      1,
+      4,
+      2
+    ]
+  },
+  {
+    "doc": "GPO-Anual-report.pdf",
+    "question": "What was GPO's total revenue in FY 2025?",
+    "expectRefusal": true,
+    "pass": true,
+    "retrievalHit": null,
+    "missing": [],
+    "scope": null,
+    "answer": "I don't have that information in the document.",
+    "retrievedPages": []
+  },
+  {
+    "doc": "GEP-Jun-2026.pdf",
+    "question": "What is the World Bank's growth forecast for Antarctica?",
+    "expectRefusal": true,
+    "pass": true,
+    "retrievalHit": null,
+    "missing": [],
+    "scope": null,
+    "answer": "I don't have that information in the document.",
+    "retrievedPages": []
+  },
+  {
+    "doc": "iMac_PER_Oct2024.pdf",
+    "question": "What is the battery life of the iMac?",
+    "expectRefusal": true,
+    "pass": true,
+    "retrievalHit": null,
+    "missing": [],
+    "scope": null,
+    "answer": "I don't have that information in the document.",
+    "retrievedPages": []
+  }
+]

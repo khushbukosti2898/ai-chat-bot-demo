@@ -1,9 +1,8 @@
-// POST /api/upload  (multipart form, field "file")
+// POST /api/upload  (multipart form, fields "file" and optional "profile")
 // Runs stages 1-5: parse -> chunk -> embed -> store. Returns stats + a chunk preview.
 import { NextResponse } from "next/server";
-import { parseFile } from "@/lib/rag/parse";
-import { chunkDocuments } from "@/lib/rag/chunk";
-import { buildVectorStore, docIdFor, registerDocument } from "@/lib/rag/vectorstore";
+import { ingestFile } from "@/lib/rag/ingest";
+import { chunkSettings, isProfile } from "@/lib/rag/profiles";
 import { config } from "@/lib/rag/config";
 
 export const runtime = "nodejs";
@@ -15,27 +14,16 @@ export async function POST(req: Request) {
     if (!(file instanceof File)) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
+    const profileField = form.get("profile");
+    const profile = isProfile(profileField) ? profileField : undefined;
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const docs = await parseFile(buffer, file.name);
-    const chunks = await chunkDocuments(docs);
-    const id = docIdFor(file.name);
-    await buildVectorStore(id, chunks);
-
-    const info = {
-      id,
-      filename: file.name,
-      pages: docs.length,
-      chunks: chunks.length,
-      characters: docs.reduce((n, d) => n + d.pageContent.length, 0),
-      indexedAt: new Date().toISOString(),
-    };
-    await registerDocument(info);
+    const { document, chunks } = await ingestFile(buffer, file.name, profile);
 
     return NextResponse.json({
-      document: info,
-      settings: { chunkSize: config.chunkSize, chunkOverlap: config.chunkOverlap, embeddingModel: config.embeddingModel },
-      preview: chunks.slice(0, 5).map((c, i) => ({ chunk: i + 1, page: c.metadata.page ?? null, text: c.pageContent })),
+      document,
+      settings: { ...chunkSettings[document.profile], embeddingModel: config.embeddingModel },
+      preview: chunks.slice(0, 5).map((c) => ({ chunk: c.id, page: c.page, section: c.section, text: c.text })),
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Upload failed";

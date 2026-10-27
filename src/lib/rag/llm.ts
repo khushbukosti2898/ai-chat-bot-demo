@@ -1,41 +1,43 @@
-// Stage 7: LLM Response
-// Combine the retrieved chunks + chat history + new question into one prompt
-// and ask Gemini. The "answer ONLY from the context" rule is what makes this
-// a grounded RAG system instead of a model guessing from general knowledge.
+// Stage 8-9: Context + LLM Response
+// The reranked chunks become numbered sources ([S1], [S2] ...) labelled with page, section and
+// element type, so the model can tell a table from a footnote and South Asia from East Asia.
+// The rules make the model answer only from those sources, copy numbers exactly, cite them,
+// and refuse when the sources don't contain the answer.
 import { AIMessage, HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { config } from "./config";
-import { retrieve, type RetrievedChunk } from "./vectorstore";
+import { retrieve, type RetrievedChunk } from "./retrieve";
+import { getText } from "./text";
+import { listDocuments } from "./vectorstore";
 
 export type ChatTurn = { role: "user" | "assistant"; content: string };
 
-const SYSTEM_PROMPT = `You are a helpful assistant that answers questions about an uploaded document.
+export const NOT_FOUND = "I don't have that information in the document.";
+
+const SYSTEM_PROMPT = `You answer questions about one document using ONLY the SOURCES below.
 
 Rules:
-- Answer using ONLY the CONTEXT below and facts already established earlier in this conversation.
-- If the answer is not in the context, reply exactly: "I don't have that information in the document."
-- Do not use outside knowledge and do not guess.
-- Keep answers concise. Mention the page number when the context provides one.
-
-CONTEXT:
+- Use only facts stated in the SOURCES (and facts already established earlier in this conversation).
+- Copy numbers, units, percentages and dates exactly as written in the sources. Never round or convert.
+- If the question is about a specific chapter, section, region, product or year, use only sources
+  labelled with that chapter/section, and never mix in figures from a different one.
+- Facts may come from tables, charts, callouts or footnotes: use them, and mention a footnote's
+  caveat when it limits the claim.
+- Cite every fact with its source tag, e.g. [S2]. Mention the page number.
+- If the sources do not contain the answer, reply exactly: "${NOT_FOUND}"
+- Do not use outside knowledge and do not guess. Keep answers concise.
+{scope}
+SOURCES:
 {context}`;
 
 function formatContext(chunks: RetrievedChunk[]): string {
   return chunks
-    .map((c) => `[Chunk ${c.chunk}${c.page ? `, page ${c.page}` : ""}]\n${c.text}`)
+    .map((c, i) => {
+      const pages = c.pageEnd > c.page ? `pages ${c.page}-${c.pageEnd}` : `page ${c.page}`;
+      const where = [pages, c.section, c.kind !== "text" ? c.kind : ""].filter(Boolean).join(" | ");
+      return `[S${i + 1}] (${where})\n${c.text}`;
+    })
     .join("\n\n");
-}
-
-// Gemini may return content as a string or as a list of content blocks.
-function getText(content: unknown): string {
-  if (typeof content === "string") return content;
-  if (Array.isArray(content)) {
-    return content
-      .filter((b) => typeof b === "object" && b !== null && (b as { type?: string }).type === "text")
-      .map((b) => (b as { text: string }).text)
-      .join("");
-  }
-  return String(content ?? "");
 }
 
 export async function answerQuestion(
@@ -43,11 +45,19 @@ export async function answerQuestion(
   question: string,
   history: ChatTurn[],
   k = config.topK,
-): Promise<{ answer: string; chunks: RetrievedChunk[] }> {
-  const chunks = await retrieve(docId, question, k);
+): Promise<{ answer: string; chunks: RetrievedChunk[]; scope: string | null }> {
+  const doc = (await listDocuments()).find((d) => d.id === docId);
+  const { chunks, scope } = await retrieve(docId, doc?.profile ?? "narrative", question, k);
 
+  // Nothing relevant survived reranking: refuse without asking the model to improvise.
+  if (chunks.length === 0) return { answer: NOT_FOUND, chunks, scope };
+
+  const system = SYSTEM_PROMPT.replace("{scope}", scope ? `\nThe question was matched to the section: ${scope}.\n` : "").replace(
+    "{context}",
+    formatContext(chunks),
+  );
   const messages = [
-    new SystemMessage(SYSTEM_PROMPT.replace("{context}", formatContext(chunks))),
+    new SystemMessage(system),
     ...history.map((t) => (t.role === "user" ? new HumanMessage(t.content) : new AIMessage(t.content))),
     new HumanMessage(question),
   ];
@@ -57,5 +67,5 @@ export async function answerQuestion(
     temperature: config.temperature,
   });
   const response = await llm.invoke(messages);
-  return { answer: getText(response.content), chunks };
+  return { answer: getText(response.content), chunks, scope };
 }
